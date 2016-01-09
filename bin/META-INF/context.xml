@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- Define the objects that Spring should create for us -->
+	<bean id="connectionFactory"
+		class="com.fdmgroup.springwalkthrough.dataaccess.ConnectionFactory"
+		init-method="checkFactorySetup" destroy-method="configDBshutdown"
+		scope="singleton">
+		<property name="url" value="oracle.fdmgroup.com" />
+		<property name="username" value="duc" />
+		<property name="password" value="secret" />
+		<property name="port" value="1234" />
+	</bean>
+
+	<!-- Constructor injection -->
+	<!-- In Spring >3.2 the order of bean declaration in the context doesn't matter, for <3.2 it does -->
+	<!-- So we can use depends-on to define their order -->
+	<bean id="jdbcReadUserCommand"
+		class="com.fdmgroup.springwalkthrough.dataaccess.JDBCReadUserCommand" depends-on="connectionFactory">
+		<constructor-arg ref="connectionFactory" />
+	</bean>
+
+	<!-- type & index are useful when dealing with overloaded constructors -->
+	<bean id="connectionPool" class="com.fdmgroup.springwalkthrough.dataaccess.ConnectionPool">
+		<constructor-arg ref="connectionFactory" />
+		<constructor-arg value="5" type="int" index="1"/>
+		<constructor-arg value="10" type="int" index="2"/>
+	</bean>
+	
+</beans>          
